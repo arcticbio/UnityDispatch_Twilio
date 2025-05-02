@@ -12,6 +12,7 @@ sms_app = Flask(__name__)
 
 conn_str = config.DB_CONN_STR
 auth_token = config.AUTH_TOKEN
+auth_endpoint = config.AUTH_ENDPOINT
 
 @sms_app.route("/sms", methods=['POST'])
 def sms_reply():
@@ -23,7 +24,7 @@ def sms_reply():
     signature = request.headers.get('X-Twilio-Signature', '')
 
     # Full URL of this endpoint
-    url = "https://twilio.unitydispatch.net/sms"
+    url = auth_endpoint
 
     # For form-encoded requests, use `request.form` (for JSON, use `request.get_json()`)
     post_vars = request.form.to_dict()
