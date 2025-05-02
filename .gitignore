@@ -1,0 +1,23 @@
+ # Byte-compiled / cache
+__pycache__/
+*.py[cod]
+db.sqlite3
+*.log
+web.config
+
+# Virtual environment
+DispatchSms/
+
+# Environment variables
+.env
+
+# VS Code settings
+.vscode/
+
+# Transcient data
+logs/
+
+# Environmental objects
+Reference/Archive/
+win-acme.v2.2.9.1701.x64.pluggable/
+nssm-2.24/
