@@ -1,5 +1,6 @@
-from flask import Flask, request
+from flask import Flask, request, abort
 from twilio.twiml.messaging_response import MessagingResponse
+from twilio.request_validator import RequestValidator
 import pyodbc
 import logging
 from app import config
@@ -10,8 +11,30 @@ logger = logging.getLogger("waitress_server")
 sms_app = Flask(__name__)
 
 conn_str = config.DB_CONN_STR
+auth_token = config.AUTH_TOKEN
+
 @sms_app.route("/sms", methods=['POST'])
 def sms_reply():
+
+    # Twlio Auth Token stored as an environment variable for security
+    validator = RequestValidator(auth_token)
+
+    # Extract the X-Twilio-Signature from the headers
+    signature = request.headers.get('X-Twilio-Signature', '')
+
+    # Full URL of this endpoint
+    url = "https://twilio.unitydispatch.net/sms"
+
+    # For form-encoded requests, use `request.form` (for JSON, use `request.get_json()`)
+    post_vars = request.form.to_dict()
+
+    # Validate the request
+    if not validator.validate(url, post_vars, signature):
+        logger.warning(f"!!Possible Attack: Twilio signature validation failed for URL={url} from {request.remote_addr}")
+        logger.warning(f"Auth={auth_token} ; {post_vars} ; {signature}")
+        abort(403)
+
+
     # === 1) Parse Twilio webhook parameters ===
     message_sid = request.form.get('MessageSid', '').strip()           # unique ID
     account_sid = request.form.get('AccountSid', '').strip()           # Twilio account
