@@ -11,6 +11,7 @@ DB_USER     = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 AUTH_TOKEN  = os.getenv("AUTH_TOKEN")
 AUTH_ENDPOINT = os.getenv("AUTH_ENDPOINT")
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 
 # Construct connection string
 DB_CONN_STR = (
