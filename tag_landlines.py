@@ -31,17 +31,7 @@ logging.basicConfig(
 log = logging.getLogger("tag_landlines")
 
 
-def ensure_column(cursor):
-    cursor.execute(
-        """
-        IF NOT EXISTS (
-            SELECT 1 FROM sys.columns
-             WHERE Name = N'IsValidMobile'
-               AND Object_ID = Object_ID(N'dbo.Clients')
-        )
-        ALTER TABLE dbo.Clients ADD IsValidMobile bit NULL
-        """
-    )
+VALID_MOBILE_TYPES = {"mobile", "fixedvoip", "nonfixedvoip"}
 
 
 def fetch_pending(cursor):
@@ -77,7 +67,7 @@ def classify(twilio, phone_key_10):
 
     lti = result.line_type_intelligence or {}
     line_type = (lti.get("type") or "").lower()
-    return line_type == "mobile"
+    return line_type in VALID_MOBILE_TYPES
 
 
 def main():
@@ -89,9 +79,6 @@ def main():
 
     with pyodbc.connect(config.DB_CONN_STR, autocommit=False) as conn:
         cursor = conn.cursor()
-
-        ensure_column(cursor)
-        conn.commit()
 
         rows = fetch_pending(cursor)
         total = len(rows)
